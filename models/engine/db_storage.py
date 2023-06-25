@@ -13,28 +13,27 @@ from os import getenv
 
 
 class DBStorage:
-    """ Database storage, creates tables in environment """
+    """Database storage class
+    Attributes: __engine, __session
+    """
     __engine = None
     __session = None
 
     def __init__(self):
-        """ Creates engine """
-        user = getenv("HBNB_MYSQL_USER")
-        passwd = getenv("HBNB_MYSQL_PWD")
-        db = getenv("HBNB_MYSQL_DB")
-        host = getenv("HBNB_MYSQL_HOST")
-        env = getenv("HBNB_ENV")
-
+        """Creates the engine"""
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                    .format(user, passwd, host, db),
-                        pool_pre_ping=True))
-
-        if env == "test":
+                                      .format(getenv('HBNB_MYSQL_USER'),
+                                              getenv('HBNB_MYSQL_PWD'),
+                                              getenv('HBNB_MYSQL_HOST'),
+                                              getenv('HBNB_MYSQL_DB')),
+                                      pool_pre_ping=True)
+        if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(bind=self.__engine)
 
     def all(self, cls=None):
-        """ Returns objects_dictionary """
+        """Method that queries on the currect database session"""
         objects_dictionary = {}
+
         if cls is None:
             objects_list = self.__session.query(State).all()
             objects_list.extend(self.__session.query(City).all())
